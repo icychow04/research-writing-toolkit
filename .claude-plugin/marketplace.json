@@ -1,0 +1,17 @@
+{
+  "name": "research-writing-toolkit",
+  "owner": {
+    "name": "Shirley"
+  },
+  "metadata": {
+    "description": "Personal marketplace bundling skills for academic research writing, literature review, citation verification, and peer review."
+  },
+  "plugins": [
+    {
+      "name": "research-writing-toolkit",
+      "version": "1.0.0",
+      "source": "./",
+      "description": "Nine skills for academic research writing: literature review, scientific writing, section drafting, citation verification, results analysis, anti-AI prose cleanup, peer review, self-review, and reviewer-response drafting."
+    }
+  ]
+}
