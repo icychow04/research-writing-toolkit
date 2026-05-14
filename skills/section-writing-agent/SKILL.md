@@ -1,231 +1,151 @@
 ---
 name: section-writing-agent
-description: Step 4 of the PaperOrchestra pipeline (arXiv:2604.05018). ONE single multimodal LLM call that drafts the remaining paper sections (Abstract, Methodology, Experiments, Conclusion), extracts numeric values from experimental_log.md into LaTeX booktabs tables, splices the generated figures from Step 2, and merges everything into the template that already contains Intro + Related Work from Step 3. TRIGGER when the orchestrator delegates Step 4 or when the user asks to "write the methodology and experiments sections" or "fill in the rest of the paper".
+description: Draft a specific section of a qualitative education research proposal or thesis from an outline plus verified sources and (where applicable) interview data. Use when the user asks to "draft my [introduction / context / literature review / theoretical framework / methodology / findings / discussion / conclusion] section". Works one section at a time, in flowing prose, in British English with APA 7. Never invents citations. Hands off polish to qualitative-academic-writing and humanising to writing-anti-ai.
+allowed-tools: Read Write Edit Bash
+license: MIT license
 ---
 
-# Section Writing Agent (Step 4)
+# Section Writing Agent
 
-Faithful implementation of the Section Writing Agent from PaperOrchestra
-(Song et al., 2026, arXiv:2604.05018, §4 Step 4, App. F.1 pp. 47–49).
+## Overview
 
-**Cost: ONE LLM call** (App. B: "Section Writing Agent (1 call): A single,
-comprehensive multimodal call to draft and compile the complete LaTeX
-manuscript"). Do NOT split this into per-section calls — the paper
-explicitly designs it as one comprehensive call so the model can maintain
-global coherence across sections.
+Draft a single section of a research proposal or doctoral thesis in qualitative education research. The deliverable is **flowing prose, one section at a time**, anchored in an outline the user has approved and in sources the user has verified.
 
-## Inputs
+This skill is the section-by-section drafter for the project on **Australian secondary teachers' experiences of using generative AI to differentiate for diverse learners** (RQ1–RQ3). It is not a manuscript pipeline, does not produce LaTeX, and does not draft an entire paper in one pass.
 
-- `workspace/outline.json` — the master plan
-- `workspace/inputs/idea.md` — technical details
-- `workspace/inputs/experimental_log.md` — raw data for tables and qualitative analysis
-- `workspace/drafts/intro_relwork.tex` — the template **with Intro + Related
-  Work already filled in by Step 3**. This is your starting point. The
-  preamble, package list, style, and the two pre-filled sections must be
-  preserved verbatim.
-- `workspace/citation_pool.json` — the citation map (`{key, title, abstract}`
-  for each verified paper)
-- `workspace/refs.bib` — the BibTeX file
-- `workspace/inputs/conference_guidelines.md` — formatting rules
-- `workspace/figures/` — the actual PNG files from Step 2 (used as
-  multimodal vision input!)
-- `workspace/figures/captions.json` — caption text per figure_id
-- `workspace/tex_profile.json` — TeX package availability flags (written by
-  `check_tex_packages.py` at Step 0). **Read this before generating any
-  LaTeX.** It tells you which packages are installed so you select the right
-  cross-reference pattern, font packages, etc. before you write — not after
-  you try to compile.
+Companion skills:
+- `literature-review` — finds sources before drafting
+- `citation-verification` — confirms every source is real and says what is claimed
+- `research-methodology-skill` — decisions and wording for the methodology section
+- `qualitative-findings-analysis` — codes, themes, quotes that feed the findings section
+- `qualitative-academic-writing` — stylistic polish after the draft is in place
+- `writing-anti-ai` — strips generic AI writing patterns
+- `supervisor-review` — pressure-tests the section before supervision
+- `paper-self-review` — final pre-submission audit on a full draft
 
-## Output
+## When to use
 
-- `workspace/drafts/paper.tex` — the complete LaTeX paper, with all sections
-  filled. The Step 5 Refinement Agent will iterate on this file.
+Trigger when the user asks to:
+- "draft the [section] section"
+- "write a first draft of [section] from my outline"
+- "expand this outline into prose"
+- "produce a section draft I can take to my supervisor"
 
-## How to do it
+Do not trigger for:
+- searching for sources → `literature-review`
+- coding interview data → `qualitative-findings-analysis`
+- deciding methodology → `research-methodology-skill`
+- polishing existing prose → `qualitative-academic-writing`
 
-### 0.5. Read tex_profile.json and select LaTeX patterns
+## Inputs required before drafting
 
-Before composing the prompt, read `workspace/tex_profile.json` and apply
-these rules to every LaTeX choice in the generated paper:
+Refuse to start without these. If any are missing, ask for them before producing prose.
 
-| Profile flag | True → use | False → use instead |
-|---|---|---|
-| `use_cleveref` | `\cref{fig:X}`, `\cref{tab:Y}` | `Figure~\ref{fig:X}`, `Table~\ref{tab:Y}` |
-| `use_nicefrac` | `\nicefrac{a}{b}` | `$a/b$` |
-| `use_microtype` | `\usepackage{microtype}` | omit the line |
-| `use_t1_fontenc` | `\usepackage[T1]{fontenc}` | omit the line |
+1. **Which section.** One of: background and context; problem statement and significance; literature review (or a named subsection); theoretical framework; research questions; methodology (or a named subsection); findings (or a named theme); discussion; conclusion.
+2. **The outline.** Paragraph-level scaffolding with claims, evidence anchors, and the RQ(s) each paragraph serves. If the user has not produced one, prompt them or call out that one is needed.
+3. **The verified sources.** Author–year keys plus the actual evidence (page numbers, key claims) the user wants drawn on. Sources must already have been passed through `citation-verification`. If not, stop and route there first.
+4. **For a findings section:** the themes, quotes (with pseudonym + transcript locator), and reflexive memos from `qualitative-findings-analysis`.
+5. **The target length.** A word count or page count. Drafts without a target tend to balloon.
+6. **The audience.** Confirmation panel, supervisor, examination committee, journal — each shifts tone and depth.
 
-If `tex_profile.json` does not exist (old workspace), default to the safe
-fallback column (no cleveref, no nicefrac, no microtype, no T1 fontenc).
+## Non-negotiables
 
-### 1. Pre-extract metrics from the experimental log
+1. **One section per call.** Do not draft "the rest of the paper" in one pass. Cohesion across sections is the user's job (and `supervisor-review`'s).
+2. **No invented citations.** If a paragraph in the outline points to a citation the user has not verified, stop at that paragraph and surface the gap. Do not approximate, do not insert a placeholder DOI, do not assume the source.
+3. **No invented data.** No invented participant quotes, pseudonyms, school details, or statistics. If the outline calls for a quote you do not have, write `[exact quote to be inserted from <participant>]` and continue.
+4. **British English.** APA 7. First person where the methodology supports it.
+5. **No overclaiming about generative AI.** Treat AI uses as emerging, contested, context-dependent. Pair every affordance with a constraint or ethical consideration.
+6. **Preserve the researcher's voice.** Keep hedging and exploratory phrasing where the outline carries them. Do not flatten to confident generalisations.
+7. **No bullet points in the deliverable.** Prose only. Lists belong to the outline, not the section.
 
-Run the deterministic helper:
+## Drafting workflow
 
-```bash
-python skills/section-writing-agent/scripts/extract_metrics.py \
-    --log workspace/inputs/experimental_log.md \
-    --out workspace/metrics.json
-```
+### 1. Read the outline and the sources
 
-This parses the `## 2. Raw Numeric Data` section's markdown tables into
-structured JSON. The Section Writing Agent uses this to construct LaTeX
-booktabs tables without re-deriving values from raw text. Read
-`references/latex-table-patterns.md` for the booktabs conventions.
+Internally walk through the outline paragraph by paragraph. For each:
+- Confirm the claim is one move, not three.
+- Confirm the evidence anchor is in the user's verified set.
+- Note any tensions or counter-evidence the user has flagged.
+- Note which RQ(s) the paragraph serves.
 
-### 2. Compose the prompt and make ONE multimodal call
+If the outline is thin, ask for more before drafting.
 
-Load `references/prompt.md` (verbatim Section Writing Agent prompt from App.
-F.1). Prepend the Anti-Leakage Prompt from
-`../paper-orchestra/references/anti-leakage-prompt.md`.
+### 2. Draft section opening
 
-The user message contains:
+Open with a sentence that names the move the section makes, not a generic preamble. Avoid:
+- "In today's rapidly evolving educational landscape..."
+- "Generative AI has transformed education in unprecedented ways..."
+- "This section will explore..."
 
-- `outline.json` — full content
-- `idea.md` — full content
-- `experimental_log.md` — full content (tables AND prose)
-- `intro_relwork.tex` — full content (this becomes `template.tex` for the prompt)
-- `citation_pool.json` — full content (becomes `citation_map.json`)
-- `conference_guidelines.md` — full content
-- `figures_list` — array of `{figure_id, filename, caption}` from
-  `captions.json` and the file listing
-- **The actual figure PNGs** as multimodal image inputs, so the model can
-  visually inspect them and write accurate descriptions / refer to them
-  correctly in the prose.
+Prefer:
+- "Differentiated instruction in Australian secondary schools sits between policy commitment and uneven enactment (Scarparolo & Porta, 2025)."
+- "I take an interpretive phenomenological approach because the study's aim is to understand teachers' lived experience, not to measure outcomes."
 
-If your host LLM has no vision input, fall back to text-only mode: pass the
-captions in `captions.json` as descriptions and tell the agent it cannot see
-the images directly. Quality drops noticeably (the paper notes that visual
-grounding measurably improves figure-text alignment), but the pipeline
-still completes.
+### 3. Draft body paragraphs
 
-### 3. Save the output
+For each outline point:
+- Topic sentence states the move.
+- Evidence is integrated inside sentences (`Bower et al. (2025) found that...`), not parked at the end as a citation list.
+- Transitions name logical relations (`however`, `by contrast`, `building on this`); avoid empty connectives.
+- Hedges (`may`, `appears to`, `suggests`) where the evidence is partial.
+- Vary sentence length. Short sentences carry emphasis; long sentences carry argument.
 
-The agent's response is wrapped in `\`\`\`latex ... \`\`\`` fences. Extract
-the LaTeX code and save to `workspace/drafts/paper.tex`.
+### 4. Draft section close
 
-### 4. Run the deterministic gates
+The close should link forward — to the next section, to the analytic move ahead, to the question the section opens up. Do not end with a "this section has shown..." summary of itself.
 
-```bash
-# Orphan citation gate: every \cite{KEY} must exist in refs.bib
-python skills/section-writing-agent/scripts/orphan_cite_gate.py \
-    workspace/drafts/paper.tex workspace/refs.bib
+### 5. Surface gaps
 
-# Latex sanity: matched braces, matched begin/end, no unescaped specials
-python skills/section-writing-agent/scripts/latex_sanity.py \
-    workspace/drafts/paper.tex
+At the end of the draft, list:
+- Any `[citation needed]` markers and what claim they sit under.
+- Any `[exact quote to be inserted]` markers and the participant they belong to.
+- Any outline points you could not draft and why.
+- Any claims you weakened relative to the outline (to avoid overclaiming) so the user can review.
 
-# Anti-leakage post-check: no author names, emails, affiliations
-python skills/paper-orchestra/scripts/anti_leakage_check.py \
-    workspace/drafts/paper.tex
-```
+## Section-specific notes
 
-If any gate fails, **re-prompt the writing call** with the gate's error
-report appended to the user message and ask the agent to fix the specific
-issues. Do NOT try to fix the gate violations by hand — the model needs to
-see its own mistakes.
+### Background and context
+Locate the study in time, place, policy. Name the jurisdiction (ACT), sector(s), and relevant policy instrument (e.g. Australian Framework for Generative AI in Schools). Avoid generic openings about "the rise of AI".
 
-## Critical rules from the prompt
+### Problem statement and significance
+State what is missing in current understanding, not what is happening in the world. For a qualitative study, significance lies in insight from teachers' lived practice, not in generalisability.
 
-These are excerpted from `references/prompt.md` (App. F.1, pp. 47-49). The
-host agent MUST honor them on the writing call:
+### Literature review (or a subsection of it)
+Argue, do not summarise. Each paragraph advances a position; each subsection advances the argument that motivates the RQs. Surface tensions. Read AI-in-education literature critically — distinguish empirical findings from vendor advocacy.
 
-### Existing-content preservation
+### Theoretical framework
+Explain how the framework will be *used* analytically — as sensitising lens, coding frame, or interpretive scaffold. Justify against alternatives the user considered. Avoid name-dropping.
 
-- DO NOT modify the text, style, or content of sections that are already
-  filled in `intro_relwork.tex`. Preserve Intro + Related Work verbatim.
-- Keep the preamble (packages, document class, style) **exactly** as is.
-- Come up with a good title if one is missing. Fill author names if missing
-  (but the Anti-Leakage Prompt says not to invent real ones — use a
-  placeholder like "Anonymous Authors" for double-blind).
+### Research questions
+Open, how/what questions appropriate to qualitative inquiry. Each RQ should map to an analytic move. If presenting RQs as a list inside the section is required, label them clearly; otherwise integrate into prose.
 
-### Data and tables
+### Methodology
+Order: paradigm → methodology → sampling → data generation → analysis → ethics → trustworthiness → reflexivity → limitations. Every decision sentence carries a "because..." or "to..." that ties it to the RQs. For wording defaults and alternatives, the user should have already worked with `research-methodology-skill`.
 
-- Build LaTeX tables for the experimental results.
-- Extract numeric values directly from `experimental_log.md`. **Do not
-  hallucinate numbers** — use the exact values in the log.
-- Use the `booktabs` package format: `\toprule`, `\midrule`, `\bottomrule`.
-- All tables must appear before the Conclusion section, unless they are
-  explicitly placed in an Appendix.
+### Findings (or a single theme)
+Lead with the theme statement (an interpretive claim, not a topic label). Anchor in 2–4 quotes per theme with pseudonyms and transcript locators. Interpret each quote; do not let it stand alone. Include negative cases where they exist.
 
-### Citations
+### Discussion
+Read findings back against the theoretical framework. Move from theme → claim → literature → so-what. Acknowledge what cannot be said. Do not import quantitative framings (effect, impact, outcome) unless the user has explicitly defended their use.
 
-- The `outline.json` provides citation_hints per subsection. For each hint,
-  find the matching key in `citation_pool.json` (by title or content) and
-  use that exact key in `\cite{...}`.
-- **Use ONLY keys from `refs.bib`.** Inventing or guessing keys violates the
-  Lit Review Agent's verified pool.
-- **Read the abstract** from `citation_pool.json` for the papers you cite.
-  Use the abstract context to write specific, accurate sentences about
-  those works — not generic "[A, B] proposed methods for X".
+### Conclusion
+Restate what the study has and has not shown. Implications for practice, policy, further research. No inflated closing claims about AI's promise.
 
-### Writing content
+## Handoffs
 
-- Write the missing sections following `outline.json`'s `section_plan`
-  structure exactly. Hierarchy rule: if 4.1 exists, 4.2 must exist.
-- Use formal mathematical equations, notations, and definitions where
-  appropriate AND directly supported by `idea.md` or `experimental_log.md`.
-  **Do not hallucinate math.** Do not use complex math just for the sake
-  of it.
-- Always provide detailed ablation studies and qualitative analysis of the
-  experimental results: what worked, what does not, and why.
-- Optional: discuss limitations and future work at the end.
-- If you put anything in the Appendix, the Appendix section appears AFTER
-  the References section, on a fresh new page.
+After the draft is delivered:
+- Tone, register, and citation polish → `qualitative-academic-writing`
+- Generic AI writing patterns → `writing-anti-ai`
+- Pressure-test before supervision → `supervisor-review`
+- Full-document audit before submission → `paper-self-review`
 
-### Figures and visual fidelity
+## Quality bar before delivering a section
 
-- You are being given the actual image files of the figures. You MUST
-  describe them faithfully and accurately. Do NOT hallucinate
-  interpretations that contradict the visual evidence in the plots.
-- Use ALL of the figures provided in `figures/`. Use the exact filenames
-  including extensions (e.g., `.png`) in your `\includegraphics` commands.
-- DO NOT merge or group multiple figures into one display.
-- If the paper is in a 2-column format, prefer single-column figures
-  (`\begin{figure}`) unless they are very wide.
-- All figures must appear before the Conclusion section, unless explicitly
-  in the Appendix.
-- Refine the captions if necessary, but they are already provided in
-  `captions.json` and should generally be used as-is.
-- Do NOT include "Figure X" in the caption text — LaTeX handles numbering.
-
-### Style
-
-- Adopt the tone of a top-tier ML conference paper: dense, objective,
-  technical.
-- Match the indentation and spacing style of the original `template.tex`.
-  Do not change the overall LaTeX style.
-
-### LaTeX integrity
-
-- The output must compile flawlessly out-of-the-box.
-- All `\begin{X}` must match a `\end{X}` (e.g., `\begin{figure*}` must be
-  closed with `\end{figure*}`, not `\end{figure}`).
-- DO NOT change `\usepackage[capitalize]{cleveref}` to
-  `\usepackage[capitalize]{cleverref}` — there is no `cleverref.sty`.
-- **Always emit `\clearpage` immediately before `\bibliographystyle{...}`.**
-  Without it, figures deferred by LaTeX's float algorithm will appear inside
-  or after the References section — a hard-to-spot layout defect that only
-  shows up in the compiled PDF. `\clearpage` forces all pending floats to be
-  output before the bibliography starts. See
-  `references/latex-table-patterns.md` for details.
-- **Cross-references**: prefer `Figure~\ref{fig:X}` and `Table~\ref{tab:Y}`
-  over bare `\ref{fig:X}`. This is necessary when `cleveref` is unavailable
-  and produces readable prose in all cases. Use `\cref{...}` only when
-  `cleveref.sty` is confirmed present.
-
-### Output format
-
-- Wrap the full updated `template.tex` in `\`\`\`latex ... \`\`\``.
-- The previously empty sections should now be filled.
-- Previously filled sections (Intro, Related Work) should remain mostly
-  untouched; only adjust for consistency purposes.
-
-## Resources
-
-- `references/prompt.md` — verbatim Section Writing Agent prompt from App. F.1
-- `references/latex-table-patterns.md` — booktabs rules + table-from-log examples
-- `references/figure-integration.md` — `\includegraphics`, 2-column handling, placement
-- `scripts/extract_metrics.py` — markdown tables in experimental_log → JSON
-- `scripts/latex_sanity.py` — unmatched braces, env mismatches, specials
-- `scripts/orphan_cite_gate.py` — every `\cite{KEY}` exists in refs.bib
+- [ ] One section, drafted to the target length (within ±15%).
+- [ ] Every empirical claim has a verified citation or a `[citation needed]` marker.
+- [ ] No invented citations, quotes, participants, or data.
+- [ ] No promotional or inflated language about AI.
+- [ ] British English, APA 7 in-text format, prose (no bullets).
+- [ ] Researcher voice and hedging preserved where the outline carries them.
+- [ ] Section opens with a substantive move and closes by linking forward.
+- [ ] Gaps surfaced at the end of the draft, not buried.

@@ -4,14 +4,14 @@
     "name": "Shirley"
   },
   "metadata": {
-    "description": "Personal marketplace bundling skills for academic research writing, literature review, citation verification, and peer review."
+    "description": "Personal marketplace bundling skills for doctoral qualitative education research: literature review, citation verification, section writing, qualitative academic writing, qualitative findings analysis, research methodology design, supervisor-style review, anti-AI prose cleanup, self-review, and reviewer-response drafting."
   },
   "plugins": [
     {
       "name": "research-writing-toolkit",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "source": "./",
-      "description": "Nine skills for academic research writing: literature review, scientific writing, section drafting, citation verification, results analysis, anti-AI prose cleanup, peer review, self-review, and reviewer-response drafting."
+      "description": "Ten skills for doctoral qualitative education research, refactored from a general scientific-writing bundle to support a study of Australian secondary teachers' experiences of using generative AI to differentiate for diverse learners."
     }
   ]
 }

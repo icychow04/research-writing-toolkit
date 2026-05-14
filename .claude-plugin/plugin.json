@@ -1,7 +1,7 @@
 {
   "name": "research-writing-toolkit",
-  "version": "1.0.0",
-  "description": "Nine skills for academic research writing: literature review, scientific writing, section drafting, citation verification, results analysis, anti-AI prose cleanup, peer review, self-review, and reviewer-response drafting.",
+  "version": "2.0.0",
+  "description": "Ten skills for doctoral qualitative education research: literature review, citation verification, section writing, qualitative academic writing (British English, APA 7), qualitative findings analysis (no statistics by default), research methodology (paradigm, phenomenology, reflexive TA, sampling, ethics, trustworthiness), supervisor-style review, anti-AI prose cleanup, self-review, and reviewer-response drafting.",
   "author": {
     "name": "Shirley"
   }

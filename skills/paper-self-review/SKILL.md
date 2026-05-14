@@ -1,161 +1,178 @@
 ---
 name: paper-self-review
-description: This skill should be used when the user asks to "review paper quality", "check paper completeness", "validate paper structure", "self-review before submission", "audit claims", "check overclaiming", "verify whether results support claims", or mentions systematic paper quality checking. Provides comprehensive quality assurance checklist for academic papers.
-version: 0.1.0
+description: Self-review checklist for a doctoral qualitative education-research proposal or thesis draft before sending it to a supervisor or submitting it. Audits research question alignment, theoretical framework coherence, literature review argument, qualitative methodology design, ethics, trustworthiness, reflexivity, APA 7 and British English conformance, overclaiming about generative AI, and overall supervisor-readiness. Use when the user asks to "self-review", "audit my proposal", "check before submission", or "is this ready to send?".
+version: 0.2.0
 ---
 
 # Paper Self-Review
 
-A systematic paper quality checking tool that helps researchers conduct comprehensive self-review before submission.
+A structured pre-submission audit for a doctoral qualitative education-research proposal or thesis chapter. The goal is to give the user an honest read of what is ready, what is not, and what is blocking the next milestone — before a supervisor, panel, or examiner sees the draft.
 
-## Core Features
+This skill checks the draft against itself and against the standards of qualitative doctoral writing. It does not search for sources (`literature-review`), does not verify citations (`citation-verification`), and does not simulate a supervisor's voice (`supervisor-review`).
 
-### 1. Structure Review
+## When to use
 
-Check whether all sections of the paper are complete and conform to academic standards:
-- Does the Abstract include problem, method, results, and contributions?
-- Does the Introduction clearly articulate research motivation and background?
-- Is the Method detailed enough to be reproducible?
-- Do the Results sufficiently support the conclusions?
-- Does the Discussion address limitations and future work?
+Trigger when the user asks to:
+- "self-review my proposal" / "audit my draft"
+- "check before I submit" / "check before confirmation"
+- "is this draft ready to send to my supervisor?"
+- "run a quality pass on the whole proposal"
+- "check whether my claims hold together"
 
-### 2. Logic Consistency Check
+Use after the draft is substantively complete. Not the right tool for an early outline or a single paragraph.
 
-Verify the logical coherence of the paper:
-- Do research questions match the methodology?
-- Does the experimental design support the research hypotheses?
-- Are result interpretations reasonable?
-- Are conclusions supported by evidence?
+## What this skill audits
 
-### 3. Citation Completeness
+Six audit areas, in order. For each, the output records what is working, what is missing, what is overclaimed, and what to do next.
 
-Check the completeness and accuracy of citations:
-- Are all citations present in the references?
-- Is the reference format consistent?
-- Are key related works cited?
-- Do citations accurately reflect the original content?
+### 1. Alignment across the spine of the proposal
+The most common doctoral-panel critique is misalignment. Check:
+- Does the problem statement match the research questions?
+- Do the RQs map cleanly to the analytic moves in the methodology?
+- Does the theoretical framework actually shape the analysis plan, or is it name-dropped?
+- Does the significance claimed at the start match what the methods can deliver?
+- Do the limitations match the design, or are they generic?
 
-### 4. Research Claim Audit
+### 2. Research question quality
+- Are RQs open, how/what questions appropriate to qualitative inquiry?
+- Has any RQ slipped into hypothesis-testing or comparative-effect phrasing?
+- Does each RQ do distinct analytic work?
+- Is the scope tractable for one study?
 
-Check whether the paper's claims are supported by the available evidence:
-- Are the main claims supported by results, citations, or analysis artifacts?
-- Are speculative observations clearly marked as tentative?
-- Does the paper avoid stronger wording than the evidence allows?
-- Are negative results, limitations, and missing baselines presented honestly?
-- Do conclusions stay inside the tested scope?
+### 3. Literature review coherence
+- Is the review organised thematically, advancing an argument that motivates the RQs?
+- Or is it chronological / paper-by-paper / topic-list?
+- Does each subsection synthesise rather than summarise?
+- Is AI-in-education literature read critically — distinguishing empirical findings from vendor advocacy?
+- Are the Australian / ACT context and policy instruments (e.g. Australian Framework for Generative AI in Schools) grounded, or generic?
+- Are there obvious gaps a panel will notice? Differentiation, inclusive education, TPACK/AI-TPACK, teacher decision-making, ethics of AI in schools — which of these are thin?
 
-This audit does not replace `results-analysis` for statistics or `citation-verification` for bibliographic verification. It checks whether paper claims correctly use the available evidence.
+### 4. Qualitative methodology design
+- Is the paradigm named (interpretivism / constructivism) and consistent with the methodology?
+- Is the methodological choice (descriptive phenomenology / interpretive phenomenology / reflexive thematic analysis) justified against the alternatives the candidate considered, not just declared?
+- Is sampling logic explicit and the sample size methodologically defensible (not quantitatively defended)?
+- Is the interview design described enough to evaluate (number of questions, probes, duration, mode, pilot)?
+- Is ethics substantive — beyond "HREC approval obtained"? Are data management, withdrawal, sensitive content, and student privacy each addressed?
+- Are trustworthiness criteria named with concrete actions (credibility, dependability, confirmability, transferability — or Braun & Clarke's quality criteria for reflexive TA)?
+- Is reflexivity positioned as analytic resource, not a one-off statement?
+- Do the limitations match the design? (E.g. do not flag "small sample" if the chosen methodology calls for small samples — flag what the small sample means for the kind of claim licensed.)
 
-### 5. Figure/Table Quality
+### 5. Claim audit — overclaiming, especially about generative AI
+For each major claim in the draft, check whether evidence licenses the strength of the wording.
 
-Evaluate the quality and effectiveness of figures and tables:
-- Do all figures/tables have clear titles and captions?
-- Do figures/tables support the text narrative?
-- Are figures/tables clear and readable?
-- Do formats comply with journal/conference requirements?
-
-### 6. Writing Clarity
-
-Check writing clarity and readability:
-- Is the language concise and clear?
-- Is technical terminology used appropriately?
-- Are sentence structures clear?
-- Is paragraph organization logical?
-
-## Quality Checklist
-
-Use this checklist for systematic paper self-review:
-
-```
-Paper Quality Checklist:
-- [ ] Abstract includes problem, method, results, contributions
-- [ ] Introduction clearly states research motivation
-- [ ] Method is reproducible
-- [ ] Results support conclusions
-- [ ] Main claims are supported by named evidence
-- [ ] Over-strong claims are weakened or removed
-- [ ] Discussion addresses limitations
-- [ ] All figures/tables have captions
-- [ ] Citations are complete and accurate
-```
-
-## When to Use
-
-Use this skill in the following scenarios:
-
-- **Pre-submission check** - Final review before submitting to a journal or conference
-- **After first draft** - Systematic review after completing the first draft
-- **Before advisor review** - Self-check before requesting advisor feedback to improve quality
-- **Post-revision verification** - After revising based on reviewer comments, verify all issues are addressed
-- **Collaborator review** - Quality check before sending to collaborators
-
-## Review Process
-
-Follow these steps for systematic paper review:
-
-### Step 1: Structure Review
-Start with the overall structure, checking if all sections are complete and logically coherent.
-
-### Step 2: Content Review
-Dive into each section, checking content accuracy and completeness.
-
-### Step 3: Research Claim Audit
-Check whether each major claim is supported by the evidence available in the draft, analysis bundle, citations, or project notes.
-
-Use this output shape:
-
+Use this shape:
 ```md
 ## Claim Audit
 
-Claim:
-Verdict: keep | weaken | revise | remove
-Evidence used:
-Missing evidence:
-Overclaim risk:
-Suggested wording:
+- **Claim:** <verbatim wording from the draft>
+- **Location:** <section, page/paragraph>
+- **Evidence anchored:** <source or "none">
+- **Verdict:** keep | weaken | revise | remove
+- **Overclaim risk:** none | low | medium | high
+- **Suggested wording:** <a tighter alternative if needed>
 ```
 
-### Step 4: Citation Check
-Verify the completeness and accuracy of all citations.
+Flag particularly:
+- Promotional or transformative language about AI ("revolutionise", "transform", "unprecedented", "harness", "unlock").
+- Quantitative framings inside a qualitative design ("AI improves outcomes", "leads to better differentiation").
+- Agentic framings ("AI personalises learning") where the real actor is the teacher mediating the tool.
+- Generalisation claims ("teachers find that...") from a study designed to surface specific lived experience.
 
-### Step 5: Figure/Table Review
-Check the quality and captions of all figures and tables.
+### 6. Surface conformance
+Lower priority than the five above, but flag for tidy-up:
+- British English throughout (no `organize`, `analyze`, `behavior`, etc.).
+- APA 7 in-text format (`Author, Year`; `et al.` from three authors; page numbers for direct quotes).
+- Reference list ordering and italics conventions.
+- No orphan bullet lists in body sections (lists belong to methods or appendices).
+- No section opens with "In today's rapidly evolving..." or similar.
+- Acronyms defined on first use.
 
-### Step 6: Writing Quality
-Review language expression and writing clarity.
+## Audit workflow
 
-### Step 7: Final Checklist
-Use the quality checklist for final verification.
+### Step 1. Inventory the draft
+Confirm what is present: which sections exist, approximate length of each, where the user has flagged a section as "not yet drafted" vs "ready for review".
 
-## Best Practices
+### Step 2. Alignment pass
+Read introduction → RQs → methodology → expected analysis as a chain. Report mismatches before reading any other section in depth.
 
-### Review Timing
-- **Spaced review** - Wait 1-2 days after completing the draft before reviewing to maintain objectivity
-- **Multiple rounds** - Conduct multiple review rounds, focusing on different aspects each time
-- **Print review** - Print a hard copy for review; issues are easier to spot on paper
+### Step 3. Section-by-section pass
+For each section, produce:
+- One-line summary of what the section is doing.
+- Three things that are working.
+- Up to five issues, prioritised, each with a concrete next step.
+- Any claim-audit entries that arose in this section.
 
-### Review Techniques
-- **Reverse reading** - Read from conclusion backwards to check logical coherence
-- **Read aloud** - Reading the paper aloud helps identify language issues
-- **Reviewer perspective** - Assume you are a reviewer and read critically
+### Step 4. Cross-section pass
+Catch issues that only appear when sections are read together:
+- Same construct, different names across sections (e.g. "differentiation" vs "differentiated instruction" vs "personalisation").
+- Same source used in two sections with subtly different claims.
+- Significance promised in the introduction but not delivered by the methodology.
+- Theoretical framework cited only in one chapter.
 
-### Common Issues
-- Abstract too brief or too verbose
-- Introduction lacks clear research question statement
-- Method lacks sufficient detail for reproduction
-- Results lack statistical significance tests
-- Discussion doesn't address research limitations
-- Figures/tables lack clear titles and captions
-- Inconsistent citation formatting
+### Step 5. Final verdict
 
-## Summary
+Use one of four buckets, with a short justification:
 
-The Paper Self-Review skill provides a systematic paper quality checking process, helping researchers identify and resolve issues before submission, improving paper quality and acceptance rates.
+- **Ready to send.** No blockers. Minor surface items only.
+- **Ready after surface fixes.** Substantively sound; needs APA 7, British English, or formatting clean-up before sending.
+- **Needs targeted revision before sending.** One or two substantive issues identified; specific next steps will close them within a week or so.
+- **Not yet ready.** Alignment, methodology, or claim issues that need supervisor input or structural rework.
 
+The verdict is honest. If the draft is not ready, say so plainly. If it is ready, say that too — empty hedging wastes the user's time.
 
-## Reference Files
+## Output format
 
-Load only what is needed:
-- `references/SECTION-CHECKLIST.md` - section-by-section review questions
-- `references/FINAL-VERDICT.md` - how to summarize submission readiness and blocking issues
-- `examples/example-self-review.md` - example review output
+```md
+# Self-Review: <draft name>
+
+## Verdict
+<one of the four buckets, with 2–3 sentences of justification>
+
+## Alignment across the spine
+<what holds together, what does not>
+
+## Section-by-section
+### <section name>
+- One-line summary
+- Working: ...
+- Issues (prioritised):
+  1. **Issue.** What it is. **Why it matters.** **Next step.**
+  ...
+
+## Claim audit
+<table or list using the claim-audit shape above>
+
+## Surface conformance
+<short list — British English, APA 7, list misuse, etc.>
+
+## Top three next steps
+1. ...
+2. ...
+3. ...
+```
+
+## Sensitivity to this project
+
+- Watch for **overclaiming about generative AI**. Flag it explicitly, with the verbatim wording.
+- Watch for **slipping into quantitative framings** inside a qualitative design. Flag it.
+- Check that **differentiation** is treated as teacher decision-making, not as something AI does.
+- Check that **diverse learners** are characterised with care, not flattened into one category.
+- Check that **ethics** is substantive throughout the design, not relegated to a paragraph.
+
+## What this skill does not do
+
+- Does not verify whether cited sources exist or say what is claimed → use `citation-verification`.
+- Does not rewrite prose → use `qualitative-academic-writing`.
+- Does not strip generic AI patterns → use `writing-anti-ai` (often runs after this audit).
+- Does not simulate supervisor voice → use `supervisor-review` for that.
+- Does not run statistical analysis or quantify findings.
+
+## Quality bar before delivering the audit
+
+- [ ] All six audit areas covered (alignment, RQs, lit review, methodology, claim audit, surface).
+- [ ] Verdict bucket is named and justified.
+- [ ] Each issue has a concrete next step, not just a critique.
+- [ ] No invented citations or fabricated quotes from the draft.
+- [ ] No vague "consider tightening" feedback without naming what to tighten.
+- [ ] Tone is honest — not flattering, not harsh.
+- [ ] Length matches the draft — a short proposal does not need a 20-page audit.
